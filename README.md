@@ -65,7 +65,12 @@ jobflow/
 
 ---
 
+## Screenshots
 
+### Menu
+![Menu](assests/menu.png)
+### Job List
+![Job List](assests/list.png)
 
 
 
