@@ -4,7 +4,6 @@ from urllib.parse import urljoin
 from datetime import datetime
 from utils import update_json,load_json,unique_id
 
-
 def homepage(jobList,session):
 
     headers = {"User-Agent": "Mozilla/5.0" }
@@ -126,8 +125,51 @@ def remoteok(jobsList,session):
                        
         
 
-    
-def remote_date_format(date):
+
+
+def arbeitnow(jobsList,session):
+
+    url="https://www.arbeitnow.com/api/job-board-api"
+    headers = {"User-Agent": "Mozilla/5.0" }
+    req=session.get(url,headers=headers)
+    if req.status_code !=200:
+        print("Request failed")
+        return 0
+
+    else:
+        existing_links={job["link"] for job in jobsList}
+        count=0
+        data=req.json()
+        jobs=data['data']
+
+        for job in jobs:
+            job_title=job.get("title","N/A")
+            company_name=job.get("company_name","N/A")
+
+            location=job.get("location") or "Unknown"
+
+            date_raw=job.get("created_at","N/A")
+            date=unix_format(date_raw)
+
+            job_url=job.get("url","N/A")
+
+            if not job_url or job_url in existing_links:
+                continue
+            job_id=unique_id(jobsList)
+            info={"id":job_id,
+                  "title":job_title,
+                  "company":company_name,
+                  "location":location,
+                  "date":date,
+                  "source":"arbeitnow",
+                  "link":job_url,
+                  "status":"not_applied"}
+            jobsList.append(info)
+            existing_links.add(info["link"])
+
+
+#for remoteOK
+def remote_date_format(date):                               
     if not date:
         return "Unknown"
     try:
@@ -136,16 +178,25 @@ def remote_date_format(date):
     except:
         return "Unknown"
 
-
-
-
-def python_date_format(date):
+#for python.org
+def python_date_format(date):                                               
     if not date:
         return "Unknown"
     try:
         date_obj= datetime.strptime(date,"%d %B %Y")
         formatted_date=date_obj.strftime("%Y-%m-%d")
         return formatted_date
+    except:
+        return "Unknown"
+
+
+#for arbeitnow  
+def unix_format(unix):                        
+    if not unix:
+        return "Unknown"
+    try:
+        dt = datetime.fromtimestamp(unix)
+        return dt.strftime("%Y-%m-%d")
     except:
         return "Unknown"
     
@@ -155,12 +206,14 @@ def python_date_format(date):
     # return(f"Last updated: {now.date()} at {ltime}")
 
 
+
 def jobs_scraper(jobsList):
     session=requests.Session()
     homepage(jobsList,session)
     remoteok(jobsList,session)
+    arbeitnow(jobsList,session)
     update_json(jobsList)
     print("Scraped")
 
 if __name__=="__main__":
-    jobs_scraper()
+    jobs_scraper(jobsList)
