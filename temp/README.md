@@ -37,7 +37,8 @@ python cli.py
 
 ---
 
-## Project Structure 
+## Project Structure
+```
 
 jobflow/
 ├── cli.py        # CLI interface (menu + input)
@@ -45,7 +46,7 @@ jobflow/
 ├── manager.py    # Core logic (search, filter, apply,view)
 ├── utils.py      # Helper functions (JSON handling, IDs)
 ├── jobs.json     # Local data storage (ignored in repo)
-
+```
 ---
 
 ## Tech Stack
