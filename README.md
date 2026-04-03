@@ -7,6 +7,7 @@ A CLI-based job tracking system that scrapes jobs from multiple sources and help
 - Scrape jobs from:
    - python.org (BeautifulSoup)
    - RemoteOK (API)
+   - Arbeitnow (API)
 - Store jobs locally using JSON
 - Search jobs by keyword (title, company, location, source)
 - Filter jobs:
