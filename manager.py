@@ -1,4 +1,4 @@
-from utils import load_json,update_json
+from utils import load_json,update_json,num_input,clear
 import webbrowser
 
 
@@ -13,8 +13,7 @@ def printjobs(jobs):
             
 
 
-def view_job(job_id):                        ###### detailed view
-    jobs=load_json()
+def view_job(jobs,job_id):                        ###### detailed view
     detailed= None
     for job in jobs:
         if job["id"]==job_id:
@@ -24,7 +23,8 @@ def view_job(job_id):                        ###### detailed view
     if not detailed:
         print("Invalid Job ID")
         return
-    
+    print("-"*40)
+
     print(f"\nJob ID: {detailed['id']}\n"
           f"Job Title: {detailed['title']}\n"
           f"Company Name: {detailed['company']}\n"
@@ -42,17 +42,48 @@ def view_job(job_id):                        ###### detailed view
 
 
 
+def filter_menu():
+
+    print("[1] Show Submitted Applications")
+    print("[2] Show Pending Applications")
+    print("[3] Show Python Jobs")
+    print("[4] Show Java Jobs")
+    print("[5] Show Remote Jobs")
+    print("[6] Show Interships")
+    while True:
+        choice = num_input("Enter your choice: ")
+        if choice is None:
+            continue
+        if 1<=choice<=6:
+            return choice
+        else:
+            print("Choose between 1 to 6")        
+   
 def filter_jobs(job_list):
-    applied=[job for job in job_list if job["status"]=="applied"]
-    not_applied=[job for job in job_list if job["status"]=="not_applied"]
-    filter_format("Submitted Applications",applied)
-    print("\n"+"-"*80+"\n")
-    filter_format("Pending Applications",not_applied)
+    choice=filter_menu()
+    clear()
+    if choice==1 :
+        applied=[job for job in job_list if job["status"]=="applied"]
+        display_format("Submitted Applications",applied)
+    elif choice==2:
+        not_applied=[job for job in job_list if job["status"]=="not_applied"]
+        display_format("Pending Applications",not_applied)
+    elif choice==3:
+        search_job("python",job_list)
+    elif choice==4:
+         search_job("java",job_list)
+    elif choice==5:
+        search_job("remote",job_list)
+    elif choice==6:
+        search_job("internship",job_list)
 
 
-def apply_job(job_id,jobsList):
+   
+
+
+def apply_job(job_list,job_id):
      choice=None
-     for job in jobsList:
+     for job in job_list:
          if job["id"]==job_id:
              choice=job
              break
@@ -63,11 +94,11 @@ def apply_job(job_id,jobsList):
          print("Already applied")
          return
         
-     view_job(job_id)
+     view_job(job_list,job_id)
      choice_input=input("Did you apply?? y or n: ")
      if choice_input.lower()=="y":
          choice["status"]="applied"
-         update_json(jobsList)
+         update_json("jobs.json",job_list)
          print("Marked as applied")
      else:
          print("Status unchanged")
@@ -80,7 +111,9 @@ def search_job(keyword,job_list):
         if keyword.lower() in job['title'].lower()\
         or keyword.lower() in job['company'].lower()\
         or keyword.lower() in job['source'].lower()\
-        or keyword.lower() in job['location'].lower():
+        or keyword.lower() in job['location'].lower()\
+        or keyword.lower() in job['description'].lower():
+
             results.append(job)
     if not results:
         print("No results found")
@@ -89,7 +122,7 @@ def search_job(keyword,job_list):
 
 
 
-def filter_format(title,job_list):
+def display_format(title,job_list):
     print("="*40)                                       # Helper function
     print(title.center(40))
     print("="*40)
