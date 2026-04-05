@@ -1,25 +1,30 @@
 import json
+import os
 
 
-def load_json():
+def load_json(name):
     try:
-        with open("jobs.json","r") as f:
+        with open(name,"r") as f:
             return json.load(f)
     except FileNotFoundError:
         return []
     except json.JSONDecodeError:
         return[]
-    
-def update_json(jobList):
-    with open("jobs.json","w") as f:
-        json.dump(jobList,f,indent=4)
 
 
-def unique_id(jobList):
-    if not jobList:
+def update_json(name,job_list):
+    with open(name,"w") as f:
+        json.dump(job_list,f,indent=4)
+
+
+def unique_id(job_list):
+    if not job_list:
         return 1
-    return max(job["id"] for job in jobList)+1
+    return max(job["id"] for job in job_list)+1
 
+
+def clear():
+    os.system("cls" if os.name =="nt" else "clear")
 
 
 def num_input(msg):
