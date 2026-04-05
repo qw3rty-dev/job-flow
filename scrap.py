@@ -4,7 +4,8 @@ from urllib.parse import urljoin
 from datetime import datetime
 from utils import update_json,load_json,unique_id
 
-def homepage(jobList,session):
+
+def homepage(job_list,session):
 
     headers = {"User-Agent": "Mozilla/5.0" }
     url= "https://www.python.org/jobs/"
@@ -16,13 +17,12 @@ def homepage(jobList,session):
         soup=BeautifulSoup(req.text,"lxml")
         jobs=soup.select(".list-recent-jobs li")
         if jobs:
-            page_scraper(jobs,url,jobList,session)
+            page_scraper(jobs,url,job_list,session)
 
 
+def page_scraper(jobs,url,job_list,session):
     
-def page_scraper(jobs,url,jobList,session):
-    
-    existing_links={job["link"] for job in jobList}
+    existing_links={job["link"] for job in job_list}
 
     for job in jobs:
         tag=job.select_one(".listing-company a")
@@ -43,6 +43,7 @@ def page_scraper(jobs,url,jobList,session):
         desc=sub_soup.select_one(".job-description")
 
         if desc:
+            description=desc.get_text(separator=" ").strip()
 
             company_tag=sub_soup.select_one(".company-name")
             if company_tag:
@@ -59,7 +60,7 @@ def page_scraper(jobs,url,jobList,session):
             date=date_tag.text.strip() if date_tag else "Not available"
             date=python_date_format(date)
 
-            job_id=unique_id(jobList)
+            job_id=unique_id(job_list)
 
         
             info={"id":job_id,
@@ -69,9 +70,10 @@ def page_scraper(jobs,url,jobList,session):
                   "date":date,
                   "source":"python.org",
                   "link":job_url,
-                  "status":"not_applied"}
+                  "status":"not_applied",
+                  "description":description}
             if info["link"] not in existing_links:
-                jobList.append(info)
+                job_list.append(info)
                 existing_links.add(info["link"])
                 
          
@@ -79,11 +81,7 @@ def page_scraper(jobs,url,jobList,session):
             continue
    
 
-
-
-
-
-def remoteok(jobsList,session):
+def remoteok(job_list,session):
 
     url="https://remoteok.com/api"
     headers = {"User-Agent": "Mozilla/5.0" }
@@ -93,7 +91,7 @@ def remoteok(jobsList,session):
         return 0
 
     else:
-        existing_links={job["link"] for job in jobsList}
+        existing_links={job["link"] for job in job_list}
         count=0
         data=req.json()
         jobs=data[1:]
@@ -108,10 +106,11 @@ def remoteok(jobsList,session):
             date=remote_date_format(date_raw)
 
             job_url=job.get("url","N/A")
+            description=job.get("description","N/A")
 
             if not job_url or job_url in existing_links:
                 continue
-            job_id=unique_id(jobsList)
+            job_id=unique_id(job_list)
             info={"id":job_id,
                   "title":job_title,
                   "company":company_name,
@@ -119,15 +118,13 @@ def remoteok(jobsList,session):
                   "date":date,
                   "source":"remoteok",
                   "link":job_url,
-                  "status":"not_applied"}
-            jobsList.append(info)
+                  "status":"not_applied",
+                  "description":description}
+            job_list.append(info)
             existing_links.add(info["link"])
                        
-        
 
-
-
-def arbeitnow(jobsList,session):
+def arbeitnow(job_list,session):
 
     url="https://www.arbeitnow.com/api/job-board-api"
     headers = {"User-Agent": "Mozilla/5.0" }
@@ -137,7 +134,7 @@ def arbeitnow(jobsList,session):
         return 0
 
     else:
-        existing_links={job["link"] for job in jobsList}
+        existing_links={job["link"] for job in job_list}
         count=0
         data=req.json()
         jobs=data['data']
@@ -153,9 +150,12 @@ def arbeitnow(jobsList,session):
 
             job_url=job.get("url","N/A")
 
+            description=job.get("description","N/A")
+
+
             if not job_url or job_url in existing_links:
                 continue
-            job_id=unique_id(jobsList)
+            job_id=unique_id(job_list)
             info={"id":job_id,
                   "title":job_title,
                   "company":company_name,
@@ -163,13 +163,15 @@ def arbeitnow(jobsList,session):
                   "date":date,
                   "source":"arbeitnow",
                   "link":job_url,
-                  "status":"not_applied"}
-            jobsList.append(info)
+                  "status":"not_applied",
+                  "description": description}
+            
+            job_list.append(info)
             existing_links.add(info["link"])
 
 
-#for remoteOK
-def remote_date_format(date):                               
+#for remoteok
+def remote_date_format(date):
     if not date:
         return "Unknown"
     try:
@@ -179,7 +181,7 @@ def remote_date_format(date):
         return "Unknown"
 
 #for python.org
-def python_date_format(date):                                               
+def python_date_format(date):
     if not date:
         return "Unknown"
     try:
@@ -188,10 +190,8 @@ def python_date_format(date):
         return formatted_date
     except:
         return "Unknown"
-
-
-#for arbeitnow  
-def unix_format(unix):                        
+#for arbeitnow
+def unix_format(unix):
     if not unix:
         return "Unknown"
     try:
@@ -199,21 +199,14 @@ def unix_format(unix):
         return dt.strftime("%Y-%m-%d")
     except:
         return "Unknown"
-    
-# def last_updated():
-    # now=datetime.now()
-    # ltime=now.time().strftime("%H:%M")
-    # return(f"Last updated: {now.date()} at {ltime}")
 
 
-
-def jobs_scraper(jobsList):
+def jobs_scraper(job_list):
     session=requests.Session()
-    homepage(jobsList,session)
-    remoteok(jobsList,session)
-    arbeitnow(jobsList,session)
-    update_json(jobsList)
+    homepage(job_list,session)
+    remoteok(job_list,session)
+    arbeitnow(job_list,session)
+    update_json("jobs.json",job_list)
     print("Scraped")
 
-if __name__=="__main__":
-    jobs_scraper(jobsList)
+
