@@ -1,5 +1,6 @@
 # JobFlow 
-A CLI-based job tracking system that scrapes jobs from multiple sources and helps manage your application workflow.
+A command-line tool that collect job listings that collects job listings from multiple sources and help manage them in one place.
+It allows you to search jobs,filter them,track application status,and view useful insights such as top companies,locations,and skill demand.
 
 ---
 
@@ -9,14 +10,19 @@ A CLI-based job tracking system that scrapes jobs from multiple sources and help
    - RemoteOK (API)
    - Arbeitnow (API)
 - Store jobs locally using JSON
-- Search jobs by keyword (title, company, location, source)
+- Search jobs by keywords (title, company, location, source,description)
 - Filter jobs:
    - Applied
    - Not Applied
 - View detailed job information
 - Open job links directly in browser
 - Track application status
-
+- View insights:
+   - Total jobs
+   - Top companies
+   - Top locations
+   - Skill-based job counts
+   - Remote jobs
 ---
 
 ## How it works
@@ -45,6 +51,7 @@ jobflow/
 ├── cli.py        # CLI interface (menu + input)
 ├── scraper.py    # Data collection (APIs + scraping)
 ├── manager.py    # Core logic (search, filter, apply,view)
+├── analysis.py   # pandas functions (insights)
 ├── utils.py      # Helper functions (JSON handling, IDs)
 ├── jobs.json     # Local data storage (ignored in repo)
 ```
@@ -54,6 +61,7 @@ jobflow/
 - Python
 - BeautifulSoup
 - Requests
+- Pandas
 - JSON
 - Webbrowser
 
@@ -71,7 +79,7 @@ jobflow/
 ### Menu
 ![Menu](assests/menu.png)
 ### Job List
-![Job List](assests/list.png)
+![Job List](assests/insights.png)
 
 
 
