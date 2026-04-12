@@ -19,7 +19,7 @@ def top_by_column(df,column,n):
         df["location"]=df["location"].str.split(",").str[0]
     top= df[column].value_counts(dropna=True).head(n)
     for i,(name,count) in enumerate(top.items(),1):
-        print(f"{i}. {name:<30} {count:>3}")
+        print(f"{i}. {truncate(name,25):<30} {count:>3}")
 
 
 def insights(df):
