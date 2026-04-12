@@ -1,4 +1,4 @@
-from utils import load_json,update_json,num_input,clear
+from utils import load_json,update_json,num_input,clear,truncate
 import webbrowser
 
 
@@ -133,5 +133,3 @@ def display_format(title,job_list):
 
 
 
-def truncate(text,length):                                        # Helper function
-    return text[:length]+ "..." if len(text)>length else text
