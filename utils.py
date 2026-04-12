@@ -26,6 +26,8 @@ def unique_id(job_list):
 def clear():
     os.system("cls" if os.name =="nt" else "clear")
 
+def truncate(text,length):                                        
+    return text[:length]+ "..." if len(text)>length else text
 
 def num_input(msg):
     while True:
