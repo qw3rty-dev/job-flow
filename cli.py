@@ -1,4 +1,4 @@
-from scrap import jobs_scraper
+from scraper import jobs_scraper
 from manager import printjobs,view_job,search_job,apply_job,filter_jobs
 from utils import num_input,load_json,clear
 from analysis import insights,json_to_df
