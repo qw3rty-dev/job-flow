@@ -74,6 +74,14 @@ jobflow/
 
 ---
 
+## Possible improvements 
+- Persistent database (SQLite)
+- Export to CSV
+- Better CLI UX
+- Scheduling for automatic scraping
+
+---
+
 ## Screenshots
 
 ### Menu
